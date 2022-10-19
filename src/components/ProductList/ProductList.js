@@ -1,14 +1,19 @@
 import './ProductList.css'
 
 const ProductList = () => {
-    const cabbageText = 'Cabbage';
+    const productList = [
+        "Cabbage",
+        "Carrots",
+        "Strawberries",
+        "Tide pods",
+        "Dahl",
+        "Cabbage",
+        "A Tesla"
+    ]
 
     return (
         <ul>
-            <li className="first-list-item">{cabbageText}</li>
-            <li>Carrots</li>
-            <li>Strawberries</li>
-            <li>Tide pods</li>
+            {productList.map( (item, index) => <li key={index}>{item}</li> )}
         </ul>
     )
 }
