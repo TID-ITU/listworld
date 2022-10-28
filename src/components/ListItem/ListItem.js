@@ -7,9 +7,9 @@ function ListItem({ item, index, deleteItem }) {
       }
 
   return (
-    <li>
-      {item}
-      <span onClick={() => handleClick(index)}>🗑️</span>
+    <li className="list-item">
+      <p className="item-name">{item}</p>
+      <button className="delete-item-button" onClick={() => handleClick(index)}>🗑️</button>
     </li>
   );
 }

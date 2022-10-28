@@ -29,12 +29,12 @@ const ProductList = () => {
   }
 
   return (
-    <div>
+    <div className="list-wrapper">
       <form onSubmit={handleSubmit}>
         <input type="text" value={input} onChange={handleChange} />
         <input type="submit" />
       </form>
-      <ul>
+      <ul className="list">
         {productList.map((item, index) => (
           <ListItem key={index} item={item} index={index} deleteItem={deleteItem} />
         ))}
