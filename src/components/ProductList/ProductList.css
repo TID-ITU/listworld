@@ -1,0 +1,13 @@
+.list-wrapper {
+    width: 25%;
+    min-width: 170px;
+}
+
+.list {
+    padding: 0;
+}
+
+.input-form {
+    display: flex;
+    justify-content: space-between;
+}
