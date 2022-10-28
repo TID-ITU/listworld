@@ -46,7 +46,6 @@ const List = ({name}) => {
     setHidden(prevState => !prevState)
   }
 
-  if (condition) { 
     return (
     <div className="list-wrapper">
       <h2>{name}</h2>
@@ -66,18 +65,9 @@ const List = ({name}) => {
           }
         </ul>
       </div>
-      }
-
-
-        </div>
-      );
-  } else {
-    return <h1>Nothing to see here!</h1>
-  }
-
-  if (otherCondition) {
-    return
-  }
+    }
+    </div>
+  );
 };
 
 export default List;
