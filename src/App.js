@@ -1,9 +1,10 @@
-import ProductList from "./components/ProductList/ProductList";
+import "./App.css"
+import List from "./components/List/List";
 
 function App() {
   return (
     <div className="App">
-      <ProductList />
+      <List name="My shopping list" />
     </div>
   );
 }
