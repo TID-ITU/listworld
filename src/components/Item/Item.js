@@ -1,14 +1,14 @@
 import { useState } from "react"
 
-export default function Item(props) {
-    const [value, setValue] = useState(props.value)
+export default function Item({deleteItem, value}) {
+    const [input, setInput] = useState(value)
     
     function handleChange(event) {
-        setValue(event.target.value)
+        setInput(event.target.value)
     }
     return (
         <li>
-            <input type={text} value={value} onChange={handleChange} />
+            <input type={text} value={input} onChange={handleChange} /><span onClick={deleteItem}> D</span>
         </li>
     )
 }

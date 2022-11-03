@@ -8,11 +8,11 @@ Parse.initialize("yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV", "35JNgEsLV9wyypSnL8
 const PARSE_HOST_URL = 'https://parseapi.back4app.com/';
 Parse.serverURL = PARSE_HOST_URL;
 
-// signIn("bjwe", "password")
+signIn("bjwe", "password")
 // signUp("moop", "password", "moop@itu.dk")
 // createList("testlist")
 // addUserToList("moop", "testlist")
-removeUserFromList("moop", "testlist")
+// removeUserFromList("moop", "testlist")
 // getUser("moop")
 // asdasd
 const root = ReactDOM.createRoot(document.getElementById('root'));
