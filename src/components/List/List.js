@@ -1,45 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createItem, deleteList, getList, removeItemFromList } from "../../API/api";
 import ListItem from "../ListItem/ListItem";
 import "./List.css";
 
-/*
-1 If statement
-if (condition) {code}
-2 Ternary operator
-condition ? code if true : code if false
-3 And operator &&
-true && true => true
-true && code => code
-condition && code
-*/
-
-
-const List = ({name}) => {
-  const condition = false
+const List = ({id, handleDelete}) => {
   const [hidden, setHidden] = useState(false)
   const [input, setInput] = useState("");
-  const [list, setList] = useState([
-    "Cabbage",
-    "Carrots",
-    "Strawberries",
-    "Tide pods",
-    "Dahl",
-    "Cabbage",
-    "A Tesla",
-  ]);
+  const [list, setList] = useState({name: "", items: []});
+
+  useEffect( () => {
+    // if (list.name.length === 0) {
+      const getData = async () => {
+        const l = await getList(id)
+        setList(l)
+        console.log(l)
+      }
+      getData()
+    // }
+  },[id])
 
   function handleChange(event) {
     setInput(event.target.value);
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    setList((prevState) => [...prevState, input]);
-    setInput("");
+
+    const itemId = await createItem(input, id)
+    if (itemId) {
+      setList((prevState) => {return {name: prevState.name, items: [...prevState.items, {name: input, id: itemId}]}});
+      setInput("");
+    } else {
+      console.log("Something went wrong")
+    }
   }
 
-  function deleteItem(index) {
-    setList( prevState => [...prevState.filter( (item, i) => i !== index )])
+  async function deleteItem(itemId) {
+    const success = await removeItemFromList(itemId, id)
+    if (success) {
+      setList( prevState => {return {name: prevState.name, items: [...prevState.items.filter( ({id}) => id !== itemId )]}})
+    } else {
+      console.log("Something went wrong")
+    }
   }
 
   function handleHideClick() {
@@ -48,18 +50,18 @@ const List = ({name}) => {
 
     return (
     <div className="list-wrapper">
-      <h2>{name}</h2>
+      <h2>{list.name.length > 0 ? list.name : "Loading..."}</h2> <button className="delete-item-button" onClick={() => handleDelete(id)}>🗑️</button>
       <button className="hide-button" onClick={handleHideClick}>{hidden ? "Show" : "Hide"} list</button>
       {
         !hidden &&
-        <div className="list-content">
+        <div className="">
         <form className="input-form" onSubmit={handleSubmit}>
           <input className="input-field" type="text" value={input} onChange={handleChange} />
           <input className="submit-button" type="submit" />
         </form>
         <ul className="list">
-          { list.length > 0 ? list.map((item, index) => (
-            <ListItem key={index} item={item} index={index} deleteItem={deleteItem} />
+          { list.items.length > 0 ? list.items.map(({name, id}) => (
+            <ListItem key={id} name={name} id={id} deleteItem={deleteItem} />
             ))
           : <h2>No items in the list.</h2>
           }
