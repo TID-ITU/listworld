@@ -1,23 +1,24 @@
-import { useState, useEffect } from "react";
-import { createItem, deleteList, getList, removeItemFromList } from "../../API/api";
+import { useState } from "react";
+import { createItem, removeItemFromList } from "../../API/api";
 import ListItem from "../ListItem/ListItem";
+import { useParseQuery } from "@parse/react";
+import Parse from "parse";
 import "./List.css";
 
-const List = ({id, handleDelete}) => {
+const List = ({list, handleDelete}) => {
   const [hidden, setHidden] = useState(false)
   const [input, setInput] = useState("");
-  const [list, setList] = useState({name: "", items: []});
 
-  useEffect( () => {
-    // if (list.name.length === 0) {
-      const getData = async () => {
-        const l = await getList(id)
-        setList(l)
-        console.log(l)
-      }
-      getData()
-    // }
-  },[id])
+  const parseQuery = new Parse.Query("Item")
+  parseQuery.equalTo("lists", list)
+  parseQuery.ascending("createdAt");
+  parseQuery.includeAll();
+
+  const { isLive, isLoading, isSyncing, results, count, error, reload } =
+    useParseQuery(parseQuery, {
+      enableLocalDatastore: true, // Enables cache in local datastore (default: true)
+      enableLiveQuery: true, // Enables live query for real-time update (default: true)
+    });
 
   function handleChange(event) {
     setInput(event.target.value);
@@ -25,10 +26,8 @@ const List = ({id, handleDelete}) => {
 
   async function handleSubmit(event) {
     event.preventDefault();
-
-    const itemId = await createItem(input, id)
+    const itemId = await createItem(input, list)
     if (itemId) {
-      setList((prevState) => {return {name: prevState.name, items: [...prevState.items, {name: input, id: itemId}]}});
       setInput("");
     } else {
       console.log("Something went wrong")
@@ -36,9 +35,8 @@ const List = ({id, handleDelete}) => {
   }
 
   async function deleteItem(itemId) {
-    const success = await removeItemFromList(itemId, id)
+    const success = await removeItemFromList(itemId, list)
     if (success) {
-      setList( prevState => {return {name: prevState.name, items: [...prevState.items.filter( ({id}) => id !== itemId )]}})
     } else {
       console.log("Something went wrong")
     }
@@ -50,7 +48,7 @@ const List = ({id, handleDelete}) => {
 
     return (
     <div className="list-wrapper">
-      <h2>{list.name.length > 0 ? list.name : "Loading..."}</h2> <button className="delete-item-button" onClick={() => handleDelete(id)}>🗑️</button>
+      <h2>{list.get("name")}</h2> <button className="delete-item-button" onClick={() => handleDelete(list)}>🗑️</button>
       <button className="hide-button" onClick={handleHideClick}>{hidden ? "Show" : "Hide"} list</button>
       {
         !hidden &&
@@ -60,8 +58,8 @@ const List = ({id, handleDelete}) => {
           <input className="submit-button" type="submit" />
         </form>
         <ul className="list">
-          { list.items.length > 0 ? list.items.map(({name, id}) => (
-            <ListItem key={id} name={name} id={id} deleteItem={deleteItem} />
+          { results ? results.map((item) => (
+            <ListItem key={item.id} name={item.get("name")} id={item.id} deleteItem={deleteItem} />
             ))
           : <h2>No items in the list.</h2>
           }

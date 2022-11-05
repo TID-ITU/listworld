@@ -12,7 +12,8 @@
 https://www.back4app.com/docs/react/data-objects/relationships
 */
 import Parse from 'parse';
-const l = console.log
+// const l = console.log
+const l = () => {}
 
 export async function signUp(username, password, email) {
     try {
@@ -52,9 +53,8 @@ list.set("name", name)
     }
 }
 
-export async function addUserToList(username, listName) {
+export async function addUserToList(username, list) {
     const user = await getUser(username)
-    const list = await getList(listName)
     l(list)
     let usersRelation = list.relation("users")
     usersRelation.add(user)
@@ -68,14 +68,13 @@ export async function addUserToList(username, listName) {
 }
 
 export async function getCurrentUserLists() {
+    l(Parse.User.current())
     const query = new Parse.Query("List")
     query.include("users", Parse.User.current())
     try {
         const lists = await query.find()
-        console.log(lists)
-        const array =  lists.map(list => {return {id: list.id, name: list.get("name")}})
-        l(array)
-        return array
+        l(lists)
+        return lists
     } catch (error) {
         l(error)
     }
@@ -107,8 +106,7 @@ async function getListObject(listId) {
     }
 }
 
-export async function deleteList(listId) {
-    const list = await getListObject(listId)
+export async function deleteList(list) {
     try {
         list.destroy()
         return true
@@ -129,8 +127,7 @@ async function getUser(username) {
     }
 }
 
-export async function getList(listId) {
-    const list = await getListObject(listId)
+export async function parseListObject(list) {
     const itemsQuery = new Parse.Query("Item")
     itemsQuery.equalTo("lists", list)
     const name = list.get("name")
@@ -144,11 +141,10 @@ export async function getList(listId) {
     }
 }
 
-export async function createItem(name, listId) {
+export async function createItem(name, list) {
     const Item = Parse.Object.extend("Item")
     const item = new Item()
     item.set("name", name)
-    const list = await getListObject(listId)
     let listsRelation = item.relation("lists")
     listsRelation.add(list)
     try {
@@ -161,9 +157,8 @@ export async function createItem(name, listId) {
     }
 }
 
-export async function removeItemFromList(itemId, listId) {
+export async function removeItemFromList(itemId, list) {
     const item = await getItem(itemId)
-    const list = await getListObject(listId)
     let listsRelation = item.relation("lists")
     listsRelation.remove(list)
     l(listsRelation)

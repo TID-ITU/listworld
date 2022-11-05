@@ -1,26 +1,37 @@
 import "./App.css"
 import List from "./components/List/List";
 import {getCurrentUserLists, signIn, createList, deleteList, signOut} from './API/api'
-import Parse from 'parse'
 import { useEffect, useState } from 'react';
 // import ProductList from "./components/ProductList/ProductList";
 
 function App() {
   const [input, setInput] = useState("")
   const [lists, setLists] = useState([])
-  const [activeList, setActiveList] = useState("")
+  const [activeList, setActiveList] = useState()
 
-  useEffect( () => {
-    if (lists.length === 0) {
-      const getData = async () => {
-        const l = await getCurrentUserLists()
-        setLists(l)
-        console.log(l)
-      }
-      getData()
-    }
-    // return () => Parse.User.logOut()
-  },[])
+  // useEffect( () => {
+  //   if (lists.length === 0) {
+  //     const getData = async () => {
+        
+  //       console.log(l)
+  //     }
+  //     getData()
+  //   }
+  //   // return () => Parse.User.logOut()
+  // },[])
+
+
+  async function handleSignIn() {
+    await signIn("bjwe", "password")
+    const l = await getCurrentUserLists()
+    console.log(l)
+    setLists(l)
+  }
+
+  async function handleSignOut() {
+    await signOut()
+    setLists([])
+  }
 
   function handleChange(event) {
     setInput(event.target.value)
@@ -45,25 +56,25 @@ function App() {
   return (
     <div className="App">
       <div className="list-admin">
-        <button onClick={() => signIn("bjwe", "password")}>Sign In</button>
-        <button onClick={() => signOut()}>Sign Out</button>
+        <button onClick={handleSignIn}>Sign In</button>
+        <button onClick={handleSignOut}>Sign Out</button>
         <form onSubmit={handleSubmit}>
         <input type="text" value={input} onChange={handleChange} />
         <input type="submit" />
         </form>
         <h3>Your lists:</h3>
         <ul className="list-nav">
-          {lists.length>0 && lists.map(({name, id}) => 
-            <li className="list-nav-item" key={id}>
-              <button className="list-nav-button" onClick={() => setActiveList(id)}>
-                {name}
+          {lists.length>0 && lists.map( list => 
+            <li className="list-nav-item" key={list.id}>
+              <button className="list-nav-button" onClick={() => setActiveList(list)}>
+                {list.get("name")}
               </button>
             </li>
           )}
         </ul>
       </div>
       <div className="list-content">
-        {activeList.length > 0 && <List id={activeList} handleDelete={handleDelete} />}
+        {activeList && <List list={activeList} handleDelete={handleDelete} />}
       </div>
     </div>
   );
