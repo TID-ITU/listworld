@@ -2,7 +2,28 @@ import "./App.css"
 import List from "./components/List/List";
 import {getCurrentUserLists, signIn, createList, deleteList, signOut} from './API/api'
 import { useEffect, useState } from 'react';
+import Parse from "parse";
 // import ProductList from "./components/ProductList/ProductList";
+
+const appkey = "yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV"
+const jskey = "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ"
+const subdomain = 'kiasnewapp.b4a.io'
+const serverURL = 'https://parseapi.back4app.com/'
+Parse.initialize("yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV", "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ")
+Parse.serverURL = serverURL
+Parse.enableLocalDatastore()
+let client = new Parse.LiveQueryClient({
+  applicationId: appkey,
+    serverURL: 'wss://' + subdomain, // Example: 'wss://livequerytutorial.back4app.io'
+    javascriptKey: jskey
+})
+client.open()
+// import { initializeParse } from  '@parse/react';
+// initializeParse(
+//   "kiasnewapp.b4a.io", 
+//   "yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV", 
+//   "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ"
+// );
 
 function App() {
   const [input, setInput] = useState("")
@@ -74,7 +95,7 @@ function App() {
         </ul>
       </div>
       <div className="list-content">
-        {activeList && <List list={activeList} handleDelete={handleDelete} />}
+        {activeList && <List list={activeList} handleDelete={handleDelete} client={client} />}
       </div>
     </div>
   );
