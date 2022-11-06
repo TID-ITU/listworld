@@ -1,46 +1,33 @@
 import "./App.css"
 import List from "./components/List/List";
 import {getCurrentUserLists, signIn, createList, deleteList, signOut} from './API/api'
-import { useEffect, useState } from 'react';
-import Parse from "parse";
+import { useState } from 'react';
 // import ProductList from "./components/ProductList/ProductList";
+import { initializeParse } from  '@parse/react';
 
-const appkey = "yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV"
-const jskey = "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ"
-const subdomain = 'kiasnewapp.b4a.io'
+const PARSE_APPLICATION_ID = "yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV"
+const PARSE_JAVASCRIPT_KEY = "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ"
+const PARSE_LIVE_QUERY_URL = 'https://kiasnewapp.b4a.io'
 const serverURL = 'https://parseapi.back4app.com/'
-Parse.initialize("yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV", "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ")
-Parse.serverURL = serverURL
-Parse.enableLocalDatastore()
-let client = new Parse.LiveQueryClient({
-  applicationId: appkey,
-    serverURL: 'wss://' + subdomain, // Example: 'wss://livequerytutorial.back4app.io'
-    javascriptKey: jskey
-})
-client.open()
-// import { initializeParse } from  '@parse/react';
-// initializeParse(
-//   "kiasnewapp.b4a.io", 
-//   "yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV", 
-//   "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ"
-// );
+// Parse.initialize("yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV", "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ")
+// Parse.serverURL = serverURL
+// Parse.enableLocalDatastore()
+// let client = new Parse.LiveQueryClient({
+//   applicationId: appkey,
+//     serverURL: 'wss://' + subdomain, // Example: 'wss://livequerytutorial.back4app.io'
+//     javascriptKey: jskey
+// })
+// client.open()
+initializeParse(
+  PARSE_LIVE_QUERY_URL, 
+  PARSE_APPLICATION_ID,
+  PARSE_JAVASCRIPT_KEY
+);
 
 function App() {
   const [input, setInput] = useState("")
   const [lists, setLists] = useState([])
   const [activeList, setActiveList] = useState()
-
-  // useEffect( () => {
-  //   if (lists.length === 0) {
-  //     const getData = async () => {
-        
-  //       console.log(l)
-  //     }
-  //     getData()
-  //   }
-  //   // return () => Parse.User.logOut()
-  // },[])
-
 
   async function handleSignIn() {
     await signIn("bjwe", "password")
@@ -95,7 +82,7 @@ function App() {
         </ul>
       </div>
       <div className="list-content">
-        {activeList && <List list={activeList} handleDelete={handleDelete} client={client} />}
+        {activeList && <List list={activeList} handleDelete={handleDelete} />}
       </div>
     </div>
   );
