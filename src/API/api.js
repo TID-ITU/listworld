@@ -83,12 +83,10 @@ export async function getCurrentUserLists() {
     }
 }
 
-export async function removeUserFromList(username, listId) {
+export async function removeUserFromList(username, list) {
     const user = await getUser(username)
-    const list = await getListObject(listId)
     let usersRelation = list.relation("users")
     usersRelation.remove(user)
-    // l(usersRelation)
     try {
         const savedList = await list.save()
         l("removeUserFromList(): ",savedList)
@@ -145,31 +143,23 @@ export async function getListItems(list) {
 }
 
 export async function createItem(name, list) {
-    const Item = Parse.Object.extend("Item")
-    const item = new Item()
-    item.set("name", name)
-    let listsRelation = item.relation("lists")
-    listsRelation.add(list)
     try {
-        const savedItem = await item.save()
-        l("createItem(): ",savedItem)
-        return savedItem
+        const item = new Parse.Object("Item")
+        item.set("name", name)
+        item.set("list", list)
+        item.save()
+        return true
     } catch (error) {
-        l("createItem(): ",error)
+        console.error(error)
         return false
     }
 }
 
-export async function removeItemFromList(item, list) {
-    let listsRelation = item.relation("lists")
-    listsRelation.remove(list)
-    l(listsRelation)
+export async function deleteItem(item) {
     try {
-        const savedItem = await item.save()
-        l("removeItemFromList(): ",savedItem)
-        return item
+        const success = item.destroy()
+        return success
     } catch (error) {
-        l("removeItemFromList(): ",error)
         return false
     }
 }

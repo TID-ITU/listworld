@@ -9,15 +9,7 @@ const PARSE_APPLICATION_ID = "yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV"
 const PARSE_JAVASCRIPT_KEY = "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ"
 const PARSE_LIVE_QUERY_URL = 'https://kiasnewapp.b4a.io'
 const serverURL = 'https://parseapi.back4app.com/'
-// Parse.initialize("yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV", "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ")
-// Parse.serverURL = serverURL
-// Parse.enableLocalDatastore()
-// let client = new Parse.LiveQueryClient({
-//   applicationId: appkey,
-//     serverURL: 'wss://' + subdomain, // Example: 'wss://livequerytutorial.back4app.io'
-//     javascriptKey: jskey
-// })
-// client.open()
+
 initializeParse(
   PARSE_LIVE_QUERY_URL, 
   PARSE_APPLICATION_ID,
@@ -52,7 +44,7 @@ function App() {
     setInput("")
   }
 
-  async function handleDelete(listId) {
+  async function handleDeleteList(listId) {
     const success = await deleteList(listId)
     if(success) {
       console.log("List deleted")
@@ -82,7 +74,7 @@ function App() {
         </ul>
       </div>
       <div className="list-content">
-        {activeList && <List list={activeList} handleDelete={handleDelete} />}
+        {activeList && <List list={activeList} deleteList={handleDeleteList} />}
       </div>
     </div>
   );
