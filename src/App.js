@@ -74,7 +74,7 @@ function App() {
         </ul>
       </div>
       <div className="list-content">
-        {activeList && <List list={activeList} deleteList={handleDeleteList} />}
+        {activeList && <List listObject={activeList} deleteList={handleDeleteList} />}
       </div>
     </div>
   );
