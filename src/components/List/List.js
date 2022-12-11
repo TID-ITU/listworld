@@ -1,71 +1,45 @@
-import { useState } from "react";
+import { deleteItem } from "../../API/api";
 import ListItem from "../ListItem/ListItem";
+import useList from "../../hooks/useList";
 import "./List.css";
 
-/*
-1 If statement
-if (condition) {code}
-2 Ternary operator
-condition ? code if true : code if false
-3 And operator &&
-true && true => true
-true && code => code
-condition && code
-*/
+const List = ({listObject, deleteList}) => {
 
+  const { input, handle, status, list, count, error, reload } = useList(listObject)
 
-const List = ({name}) => {
-  const condition = false
-  const [hidden, setHidden] = useState(false)
-  const [input, setInput] = useState("");
-  const [list, setList] = useState([
-    "Cabbage",
-    "Carrots",
-    "Strawberries",
-    "Tide pods",
-    "Dahl",
-    "Cabbage",
-    "A Tesla",
-  ]);
-
-  function handleChange(event) {
-    setInput(event.target.value);
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    setList((prevState) => [...prevState, input]);
-    setInput("");
-  }
-
-  function deleteItem(index) {
-    setList( prevState => [...prevState.filter( (item, i) => i !== index )])
-  }
-
-  function handleHideClick() {
-    setHidden(prevState => !prevState)
+  async function handleDeleteItem(item) {
+    const success = await deleteItem(item)
+    const name = item.get("name")
+    if (success) {
+      console.log(name + "was deleted")
+    } else {
+      console.log("Something went wrong")
+    }
   }
 
     return (
     <div className="list-wrapper">
-      <h2>{name}</h2>
-      <button className="hide-button" onClick={handleHideClick}>{hidden ? "Show" : "Hide"} list</button>
-      {
-        !hidden &&
-        <div className="list-content">
-        <form className="input-form" onSubmit={handleSubmit}>
-          <input className="input-field" type="text" value={input} onChange={handleChange} />
+      <h2>{listObject.get("name")}</h2> <button className="delete-item-button" onClick={() => deleteList(listObject)}>🗑️</button>
+      <button className="hide-button" onClick={reload}>Reload</button>
+        <div className="">
+        <form className="input-form" onSubmit={handle.submit}>
+          <input className="input-field" type="text" value={input} onChange={handle.change} />
           <input className="submit-button" type="submit" />
         </form>
         <ul className="list">
-          { list.length > 0 ? list.map((item, index) => (
-            <ListItem key={index} item={item} index={index} deleteItem={deleteItem} />
-            ))
+          { list ? list.sort((a, b) => a.get("createdAt") > b.get("createdAt"))
+          .map((item) => (
+            <ListItem key={item.id} item={item} deleteItem={handleDeleteItem} />
+          ))
           : <h2>No items in the list.</h2>
           }
         </ul>
+        {status.isLoading && <p>{"Loading…"}</p>}
+        {status.isSyncing && <p>{"Syncing…"}</p>}
+        {status.isLive ? <p>{"Status: Live"}</p> : <p>{"Status: Offline"}</p>}
+        {error && <p>{error.message}</p>}
+        {count && <p>{`Count: ${count}`}</p>}
       </div>
-    }
     </div>
   );
 };

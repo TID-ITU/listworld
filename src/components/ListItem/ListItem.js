@@ -1,15 +1,15 @@
 import "./ListItem.css";
 
-function ListItem({ item, index, deleteItem }) {
+function ListItem({ item, deleteItem }) {
 
-    function handleClick(index) {
-        deleteItem(index)
+    function handleClick() {
+        deleteItem(item)
       }
 
   return (
     <li className="list-item">
-      <p className="item-name">{item}</p>
-      <button className="delete-item-button" onClick={() => handleClick(index)}>🗑️</button>
+      <p className="item-name">{item.get("name")}</p>
+      <button className="delete-item-button" onClick={handleClick}>🗑️</button>
     </li>
   );
 }

@@ -13,53 +13,61 @@ https://www.back4app.com/docs/react/data-objects/relationships
 */
 import Parse from 'parse';
 const l = console.log
+// const l = () => {}
 
 export async function signUp(username, password, email) {
     try {
         const user = await Parse.User.signUp(username, password, {email: email})
-        l(user)
+        l("SignUp():",user)
     } catch (error) {
-        l(error)
+        l("SignUp():",error)
     }
 }
 
 export async function signIn(username, password) {
     try {
         const user = await Parse.User.logIn(username, password)
-        l(user)
+        l("SignIn():",user)
     } catch (error) {
-        l(error)
+        l("SignIn():",error)
+    }
+}
+
+export async function signOut() {
+    try {
+        const success = Parse.User.logOut()
+        l("SignOut():",success)
+    } catch (error) {
+        l("SignOut():",error)
     }
 }
 
 export async function createList(name) {
 const List = Parse.Object.extend("List")
 const list = new List()
-l(list)
+// l(list)
 let usersRelation = list.relation("users")
 usersRelation.add(Parse.User.current())
 list.set("name", name)
     try {
         const savedList = await list.save()
-        l("Created list: ",savedList)
+        l("CreateList(): ",savedList)
         return savedList
     } catch (error) {
-        l(error)
+        l("CreateList(): ",error)
     }
 }
 
-export async function addUserToList(username, listName) {
+export async function addUserToList(username, list) {
     const user = await getUser(username)
-    const list = await getList(listName)
-    l(list)
+    // l(list)
     let usersRelation = list.relation("users")
     usersRelation.add(user)
-    l(usersRelation)
     try {
         const savedList = await list.save()
-        l(savedList)
+        l("addUserToList(): ",savedList)
     } catch (error) {
-        l(error)
+        l("addUserToList(): ",error)
     }
 }
 
@@ -68,27 +76,22 @@ export async function getCurrentUserLists() {
     query.include("users", Parse.User.current())
     try {
         const lists = await query.find()
-        console.log(lists)
-        const array =  lists.map(list => {return {id: list.id, name: list.get("name")}})
-        l(array)
-        return array
+        l("getCurrentUserLists(): ",lists)
+        return lists
     } catch (error) {
-        l(error)
+        l("getCurrentUserLists(): ",error)
     }
 }
 
-export async function removeUserFromList(username, listId) {
+export async function removeUserFromList(username, list) {
     const user = await getUser(username)
-    const list = await getListObject(listId)
-    l(list)
     let usersRelation = list.relation("users")
     usersRelation.remove(user)
-    l(usersRelation)
     try {
         const savedList = await list.save()
-        l(savedList)
+        l("removeUserFromList(): ",savedList)
     } catch (error) {
-        l(error)
+        l("removeUserFromList(): ",error)
     }
 }
 
@@ -96,10 +99,22 @@ async function getListObject(listId) {
     const listQuery = new Parse.Query("List")
     listQuery.equalTo("objectId", listId)
     try {
-        const list = await listQuery.find()
+        const list = await listQuery.first()
+        l("getListObject(): ",list)
         return list
     } catch (error) {
-        l(error)
+        l("getListObject(): ",error)
+    }
+}
+
+export async function deleteList(list) {
+    try {
+        const success = list.destroy()
+        l("deleteList(): ",success)
+        return true
+    } catch (error) {
+        l("deleteList(): ",error)
+        return false
     }
 }
 
@@ -108,63 +123,55 @@ async function getUser(username) {
     query.equalTo("username", username)
     try {
         const user = await query.first()
-        l("User from getUser:", user)
+        l("getUser():", user)
         return user
     } catch (error) {
-        l(error)
+        l("getUser(): ",error)
     }
 }
 
-export async function getList(listId) {
-    const list = getListObject(listId)
+export async function getListItems(list) {
     const itemsQuery = new Parse.Query("Item")
-    itemsQuery.equalTo("lists", listId)
-    const name = list.get("name")
+    itemsQuery.equalTo("lists", list)
     try {
         const items = await itemsQuery.find()
-        l("list from getList:", items, name)
-        return {name, items}
+        l("getListItems():", items)
+        return items
     } catch (error) {
-        l(error)
+        l("getListItems():",error)
     }
 }
 
-export async function createItem(name, listId) {
-    const Item = Parse.Object.extend("Item")
-    const item = new Item()
-    item.set("name", name)
-    let listsRelation = item.relation("lists")
-    listsRelation.add(listId)
+export async function createItem(name, list) {
     try {
-        const savedItem = await item.save()
-        l(savedItem)
+        const item = new Parse.Object("Item")
+        item.set("name", name)
+        item.set("list", list)
+        item.save()
+        return true
     } catch (error) {
-        l(error)
+        console.error(error)
+        return false
     }
 }
 
-export async function removeItemFromList(itemId, listId) {
-    const item = await getItem(itemId)
-    // const list = await getListObject(listId)
-    let listsRelation = item.relation("lists")
-    listsRelation.remove(listId)
-    l(listsRelation)
+export async function deleteItem(item) {
     try {
-        const savedItem = await item.save()
-        l(savedItem)
+        const success = item.destroy()
+        return success
     } catch (error) {
-        l(error)
+        return false
     }
 }
 
 async function getItem(itemId) {
-    const query = Parse.Query("Item")
+    const query = new Parse.Query("Item")
     query.equalTo("objectId", itemId)
     try {
         const item = await query.first()
-        l(item)
+        l("getItem(): ",item)
         return item
     } catch (error) {
-        l(error)
+        l("getItem(): ",error)
     }
 }

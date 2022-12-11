@@ -1,54 +1,81 @@
 import "./App.css"
 import List from "./components/List/List";
-import {getCurrentUserLists, createList} from './API/api'
-import Parse from 'parse'
-import { useEffect, useState } from 'react';
+import {getCurrentUserLists, signIn, createList, deleteList, signOut} from './API/api'
+import { useState } from 'react';
 // import ProductList from "./components/ProductList/ProductList";
+import { initializeParse } from  '@parse/react';
+
+const PARSE_APPLICATION_ID = "yQQzmBNtqIXWZ3hXkpzDbT5TEX8CxQ6MTBps5XAV"
+const PARSE_JAVASCRIPT_KEY = "35JNgEsLV9wyypSnL8Qfg2sUCo4b0DLIy2ugTiUJ"
+const PARSE_LIVE_QUERY_URL = 'https://kiasnewapp.b4a.io'
+const serverURL = 'https://parseapi.back4app.com/'
+
+initializeParse(
+  PARSE_LIVE_QUERY_URL, 
+  PARSE_APPLICATION_ID,
+  PARSE_JAVASCRIPT_KEY
+);
 
 function App() {
   const [input, setInput] = useState("")
   const [lists, setLists] = useState([])
-  const [activeList, setActiveList] = useState("")
+  const [activeList, setActiveList] = useState()
 
-  useEffect( () => {
-    if (lists.length === 0) {
-      const getData = async () => {
-        const l = await getCurrentUserLists()
-        setLists(l)
-        console.log(l)
-      }
-      getData()
-    }
-    return () => Parse.User.logOut()
-  },[])
+  async function handleSignIn() {
+    await signIn("bjwe", "password")
+    const l = await getCurrentUserLists()
+    console.log(l)
+    setLists(l)
+  }
+
+  async function handleSignOut() {
+    await signOut()
+    setLists([])
+  }
 
   function handleChange(event) {
     setInput(event.target.value)
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(event) {
+    event.preventDefault();
     const list = await createList(input)
     setLists(prevState => [...prevState, {name: input, id: list.id}])
     setInput("")
   }
+
+  async function handleDeleteList(listId) {
+    const success = await deleteList(listId)
+    if(success) {
+      console.log("List deleted")
+      setActiveList("")
+      setLists(prevState => [...prevState.filter( ({id}) => id !== listId )])
+    }
+  }
   
   return (
     <div className="App">
-      <form onSubmit={handleSubmit}>
-      <input type="text" value={input} onChange={handleChange} />
-      <input type="submit" />
-      </form>
-      <ul>
-        {lists.length>0 && lists.map(({name, id}) => 
-          <li key={id}>
-            <button onClick={() => setActiveList(id)}>
-              {name}
-            </button>
-          </li>
-        )}
-      </ul>
-      {/* <List  /> */}
-      
+      <div className="list-admin">
+        <button onClick={handleSignIn}>Sign In</button>
+        <button onClick={handleSignOut}>Sign Out</button>
+        <form onSubmit={handleSubmit}>
+        <input type="text" value={input} onChange={handleChange} />
+        <input type="submit" />
+        </form>
+        <h3>Your lists:</h3>
+        <ul className="list-nav">
+          {lists.length>0 && lists.map( list => 
+            <li className="list-nav-item" key={list.id}>
+              <button className="list-nav-button" onClick={() => setActiveList(list)}>
+                {list.get("name")}
+              </button>
+            </li>
+          )}
+        </ul>
+      </div>
+      <div className="list-content">
+        {activeList && <List listObject={activeList} deleteList={handleDeleteList} />}
+      </div>
     </div>
   );
 }
