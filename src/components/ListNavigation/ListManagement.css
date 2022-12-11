@@ -1,0 +1,22 @@
+.list-nav {
+    margin: 0;
+    padding: 0;
+}
+
+.list-nav-item {
+    list-style-type: none;
+    margin: 2px 0px;
+    display: flex;
+    justify-content: center;
+}
+
+.list-nav-button {
+    display: flex;
+    justify-content: space-between;
+    background-color: midnightblue;
+    border-radius: 5px;
+    padding: 2px;
+    color: white;
+    width: 70%;
+    font-size: large;
+}
