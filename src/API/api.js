@@ -42,6 +42,10 @@ export async function signOut() {
     }
 }
 
+export async function getCurrentUser() {
+    return await Parse.User.current()
+}
+
 export async function createList(name) {
 const List = Parse.Object.extend("List")
 const list = new List()
