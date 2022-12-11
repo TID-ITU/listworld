@@ -16,9 +16,6 @@ initializeParse(
 );
 
 function App() {
-  const [input, setInput] = useState("")
-  const [lists, setLists] = useState([])
-  const [liveLists, setLiveLists] = useState(false)
   const [activeList, setActiveList] = useState()
 
   async function handleSignIn() {
@@ -31,17 +28,6 @@ function App() {
     setLists([])
   }
 
-  function handleChange(event) {
-    setInput(event.target.value)
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    const list = await createList(input)
-    setLists(prevState => [...prevState, {name: input, id: list.id}])
-    setInput("")
-  }
-
   async function handleDeleteList(listId) {
     const success = await deleteList(listId)
     if(success) {
@@ -51,19 +37,6 @@ function App() {
     }
   }
 
-  function handleLiveListTogge() {
-    setLiveLists(prevState => !prevState)
-  }
-
-  useEffect(() => {
-    async function syncLists() {
-      if (!liveLists && getCurrentUser) {
-        setLists(await getCurrentUserLists())
-      }
-    }
-    syncLists()
-  }, [liveLists])
-  
   return (
     <div className="App">
       <div className="list-admin">
