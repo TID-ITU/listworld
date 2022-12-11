@@ -1,0 +1,21 @@
+.delete-item-button {
+    border-radius: 5px;
+    border-color: rgba(255, 255, 255, 0);
+    height: 90%;
+    cursor: pointer;
+}
+
+.list-item {
+    list-style-type: none;
+    margin: 2px 0px;
+    display: flex;
+    justify-content: space-between;
+    background-color: midnightblue;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+.item-name {
+    margin: 0 5px;
+    color: aliceblue;
+}
